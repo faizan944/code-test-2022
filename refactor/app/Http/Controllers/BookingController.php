@@ -5,6 +5,7 @@ namespace DTApi\Http\Controllers;
 use DTApi\Models\Job;
 use DTApi\Http\Requests;
 use DTApi\Models\Distance;
+use DTApi\Service\BookingService;
 use Illuminate\Http\Request;
 use DTApi\Repository\BookingRepository;
 
@@ -20,13 +21,16 @@ class BookingController extends Controller
      */
     protected $repository;
 
+    protected $bookingService;
+
     /**
      * BookingController constructor.
      * @param BookingRepository $bookingRepository
      */
-    public function __construct(BookingRepository $bookingRepository)
+    public function __construct(BookingRepository $bookingRepository, BookingService $bookingService)
     {
         $this->repository = $bookingRepository;
+        $this->bookingService = $bookingService;
     }
 
     /**
@@ -37,7 +41,7 @@ class BookingController extends Controller
     {
         if($user_id = $request->get('user_id')) {
 
-            $response = $this->repository->getUsersJobs($user_id);
+            $response = $this->bookingService->getUsersJobs($user_id);
 
         }
         elseif($request->__authenticatedUser->user_type == env('ADMIN_ROLE_ID') || $request->__authenticatedUser->user_type == env('SUPERADMIN_ROLE_ID'))
@@ -67,7 +71,7 @@ class BookingController extends Controller
     {
         $data = $request->all();
 
-        $response = $this->repository->store($request->__authenticatedUser, $data);
+        $response = $this->bookingService->store($request->__authenticatedUser, $data);
 
         return response($response);
 
@@ -109,7 +113,7 @@ class BookingController extends Controller
     {
         if($user_id = $request->get('user_id')) {
 
-            $response = $this->repository->getUsersJobsHistory($user_id, $request);
+            $response = $this->bookingService->getUsersJobsHistory($user_id, $request);
             return response($response);
         }
 
